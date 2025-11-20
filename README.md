@@ -3,6 +3,8 @@
 
 # 🐞 Bug Calculator App | Full-Stack Microservices Project
 
+![Microservices](https://img.shields.io/badge/Microservices-1%20Service%20Ready-green)
+![Status](https://img.shields.io/badge/Status-Auth%20Service%20Live-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -18,6 +20,19 @@ bug-calculator-app/
 ├── 🐞 bug-service/ # Bug tracking & reporting
 ├── ⚛️ frontend/ # React TypeScript application
 └── 🐳 docker-compose.yml # Infrastructure setup
+
+## 📈 Current Status
+
+### ✅ Implemented
+- **Auth Service** - Full implementation
+- MongoDB integration with Docker
+- Swagger API documentation
+- Layered architecture pattern
+
+### 🚧 Ready for Development
+- Calculator Service (planned)
+- Bug Tracking Service (planned) 
+- React Frontend (planned)
 
 ## 🚀 Microservices
 
