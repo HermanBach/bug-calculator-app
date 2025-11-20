@@ -12,3 +12,75 @@
 **Educational full-stack project demonstrating microservices architecture with intentionally buggy calculator for testing practice.**
 
 ## 🏗 Project Architecture
+bug-calculator-app/
+├── 🛡 auth-service/ # Authentication & Authorization
+├── 🧮 calculator-service/ # Buggy calculator logic
+├── 🐞 bug-service/ # Bug tracking & reporting
+├── ⚛️ frontend/ # React TypeScript application
+└── 🐳 docker-compose.yml # Infrastructure setup
+
+## 🚀 Microservices
+
+### 🔐 Auth Service
+- **JWT-based authentication**
+- **User registration & login**
+- **MongoDB user storage**
+- **Swagger API documentation**
+
+### 🧮 Calculator Service 
+- **Intentional bugs for testing practice**
+- **Mathematical operations with hidden defects**
+- **RabbitMQ message queue integration**
+
+### 🐞 Bug Service
+- **Bug reporting & tracking**
+- **User bug discovery statistics**
+- **Achievement system**
+
+### ⚛️ Frontend Application
+- **React with TypeScript**
+- **Calculator UI with bug discovery**
+- **Real-time bug reporting**
+
+## 🛠 Tech Stack
+
+### Backend
+- **Node.js** with **TypeScript**
+- **Express.js** frameworks
+- **MongoDB** databases
+- **RabbitMQ** message broker
+- **JWT** authentication
+- **Swagger/OpenAPI** documentation
+
+### Frontend
+- **React 18** with **TypeScript**
+- **State management** (Context/Redux)
+- **Modern UI framework**
+
+### DevOps
+- **Docker** containerization
+- **Docker Compose** for local development
+- **CI/CD** pipelines (planned)
+
+## 🎯 Learning Objectives
+
+- ✅ **Microservices Architecture**
+- ✅ **Domain-Driven Design (DDD)**
+- ✅ **Layered Architecture Patterns**
+- ✅ **Message Queue Systems**
+- ✅ **API Design & Documentation**
+- ✅ **Containerization with Docker**
+- ✅ **Testing & Debugging Strategies**
+
+## 🚀 Quick Start
+
+```bash
+# Clone repository
+git clone https://github.com/your-username/bug-calculator-app.git
+cd bug-calculator-app
+
+# Start all services with Docker
+docker-compose up -d
+
+# Or run services individually
+cd auth-service && npm run dev
