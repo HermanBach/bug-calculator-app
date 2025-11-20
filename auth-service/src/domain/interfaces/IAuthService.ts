@@ -1,4 +1,4 @@
-import { User } from "../entities/user.entity";
+import { User } from "../entities/User.entity";
 import { LoginResult } from "../entities/loginResult.entity";
 
 export interface IAuthService {
