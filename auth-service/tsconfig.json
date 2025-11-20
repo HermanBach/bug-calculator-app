@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",           // В какую версию JS компилировать
+    "module": "commonjs",         // Система модулей (Node.js использует commonjs)
+    "outDir": "./dist",           // Куда складывать скомпилированные .js файлы
+    "rootDir": "./src",           // Гле лежат исходные .ts файлы
+    "strict": true,               // Включить все строгие проверки типов
+    "esModuleInterop": true,      // Совместимость с CommonJS/ES модулями
+    "skipLibCheck": true          // Пропускать проверку типов в node_modules
+  }
+}
