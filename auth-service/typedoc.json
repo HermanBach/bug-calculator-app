@@ -1,0 +1,7 @@
+{
+  "entryPoints": ["src/presentation", "src/domain", "src/application", "src/infrastructure"],
+  "entryPointStrategy": "expand",
+  "out": "docs",
+  "name": "Bug Calculator App - Auth Service",
+  "includeVersion": true
+}

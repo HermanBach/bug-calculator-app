@@ -2,11 +2,7 @@ import { Request, Response } from "express";
 import { AuthService } from "../../application/services/AuthService";
 import { MongoUserRepository } from "../../infrastructure/database/MongoUserRepository";
 import { JwtTokenService } from "../../infrastructure/auth/JwtTokenService";
-import { log } from "console";
-// AuthController.ts
-/**
- * 
- */
+
 export class AuthController {
 
     private authService: AuthService;
@@ -17,6 +13,29 @@ export class AuthController {
 
         this.authService = new AuthService(userRepository, tokenService);
     }
+    /**
+    * @swagger
+    * /auth-service/register:
+    *   post:
+    *     summary: Register new user
+    *     tags: [Authentication]
+    *     requestBody:
+    *       required: true
+    *       content:
+    *         application/json:
+    *           schema:
+    *             type: object
+    *             properties:
+    *               login:
+    *                 type: string
+    *               email:
+    *                 type: string  
+    *               password:
+    *                 type: string
+    *     responses:
+    *       200:
+    *         description: User created
+    */
 
     async register (req: Request, resp: Response){
         try {
@@ -37,6 +56,63 @@ export class AuthController {
 
         } catch (error) {
             const message = error instanceof Error ? error.message : "Registration failed"
+            return resp.status(400).json({ error: message });
+        }
+    }
+    /**
+     * @swagger
+     * /auth-service/login:
+     *   post:
+     *     summary: Login user
+     *     tags: [Authentication] 
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               identifier:
+     *                 type: string
+     *               password:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Login successful
+     */
+    async login (req: Request, resp: Response){
+        try {
+            const { identifier, password } = req.body;
+
+            if (!identifier || !password){
+                return resp.status(400).json({
+                    error: 'Missing required fields: identifier, password'
+                });
+            }
+
+            const loginResult = await this.authService.login(
+                identifier,
+                password
+            );
+
+            if (!loginResult){
+                return resp.status(400).json({
+                    error: 'Login error'
+                });
+            }
+
+            resp.status(200).json({
+                message: "Ok",
+                user: {
+                    id: loginResult.user.id,
+                    login: loginResult.user.login,
+                    email: loginResult.user.email
+                },
+                accessToken: loginResult.accessToken,
+                expiresAt: loginResult.expiresAt
+            })
+        } catch (error){
+            const message = error instanceof Error ? error.message : "Login failed"
             return resp.status(400).json({ error: message });
         }
     }
