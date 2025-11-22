@@ -1,3 +1,4 @@
+import 'dotenv-flow/config';
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { MongoConnection } from '../infrastructure/database/Mongo.connection';
