@@ -15,7 +15,7 @@ export class AuthController {
     }
     /**
     * @swagger
-    * /auth-service/register:
+    * /auth-service/auth/register:
     *   post:
     *     summary: Register new user
     *     tags: [Authentication]
@@ -61,7 +61,7 @@ export class AuthController {
     }
     /**
      * @swagger
-     * /auth-service/login:
+     * /auth-service/auth/login:
      *   post:
      *     summary: Login user
      *     tags: [Authentication] 
@@ -115,6 +115,20 @@ export class AuthController {
             const message = error instanceof Error ? error.message : "Login failed"
             return resp.status(400).json({ error: message });
         }
+    }
+    /**
+     * @swagger
+     * /auth-service/auth/logout:
+     *   post:
+     *     summary: Logout user and invalidate token
+     *     tags: [Authentication]
+     *     responses:
+     *       200:
+     *         description: Successfully logged out
+     */
+    async logout (req: Request, resp: Response){
+        // TODO: make with blacklist
+        resp.json({message: "Logged out successfully"});
     }
 
 }
