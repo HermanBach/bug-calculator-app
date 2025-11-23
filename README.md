@@ -87,8 +87,8 @@ bug-calculator-app/
 - ✅ **Containerization with Docker**
 - ✅ **Testing & Debugging Strategies**
 
-⚙️ Environment Configuration
-Create .env.local file in each service root:
+## ⚙️ Environment Configuration
+Create `.env.local` file in each service root:
 
 # JWT Configuration
 JWT_SECRET=your-super-secret-key-here
