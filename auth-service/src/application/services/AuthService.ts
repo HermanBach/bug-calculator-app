@@ -3,13 +3,13 @@ import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { ITokenService } from "../../domain/interfaces/ITokenService";
 import { User } from "../../domain/entities/User.entity";
 import { LoginResult } from "../../domain/entities/loginResult.entity";
-import { MongoUserRepository } from "../../infrastructure/database/MongoUserRepository";
-import { error } from "console";
+import { PasswordService } from "../../infrastructure/auth/PasswordService";
 
 export class AuthService implements IAuthService {
     constructor (
         private userRepository: IUserRepository,
-        private tokenService: ITokenService
+        private tokenService: ITokenService,
+        private passwordService = new PasswordService()
     ) {}
 
 
@@ -20,12 +20,14 @@ export class AuthService implements IAuthService {
         if (existUser){
             throw new Error ("User with this email already exists");
         }
+
+        const hashedPassword = await this.passwordService.hashPassword(password);
         
         const newUser = new User(
             this.generatorUserId(),
             login,
             email,
-            password
+            hashedPassword
         );
 
         return await this.userRepository.save(newUser);
@@ -38,7 +40,9 @@ export class AuthService implements IAuthService {
             throw new Error ("User not found");
         }
 
-        if (findedUser.password !== password){
+        const passwordIsValid = await this.passwordService.comparePassword(password, findedUser.password);
+
+        if (!passwordIsValid){
             throw new Error ("Invalid password");
         }
 
