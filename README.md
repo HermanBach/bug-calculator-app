@@ -87,6 +87,45 @@ bug-calculator-app/
 - ✅ **Containerization with Docker**
 - ✅ **Testing & Debugging Strategies**
 
+⚙️ Environment Configuration
+Create .env.local file in each service root:
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-key-here
+JWT_EXPIRES_IN=24h
+ISSUER=BUG-CALCULATOR-APP-AUTH-SERVICE
+
+# Database
+DATABASE_URL=mongodb:your_url
+
+# Security
+SALTROUNDS=10
+
+# Development
+LOG_LEVEL=debug
+ENABLE_DEBUG_ROUTES=true
+
+🚨 Important Security Notes
+Never commit .env.local to version control - add to .gitignore
+
+Use .env.example as a safe template for new developers
+
+Generate strong JWT secrets (min. 32 characters)
+
+Use different configurations per environment:
+
+.env.local - Development
+
+.env.production - Production
+
+.env.test - Testing
+
+📁 File Structure
+auth-service/
+├── .env.local          # ⚠️ Add to .gitignore
+├── .env.example        # 📋 Template for developers
+└── src/
+
 ## 🚀 Quick Start
 
 ```bash
@@ -99,3 +138,16 @@ docker-compose up -d
 
 # Or run services individually
 cd auth-service && npm run dev
+
+🔧 First Time Setup
+# 1. Copy environment template
+cp .env.example .env.local
+
+# 2. Edit with your values
+nano .env.local
+
+# 3. Install dependencies
+npm install
+
+# 4. Start development server
+npm run dev
