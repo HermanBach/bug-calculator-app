@@ -75,6 +75,15 @@ export class AuthService implements IAuthService {
         return new LoginResult(findedUser, token);
     }
 
+    refreshToken(token: string): string {
+        const newToken = this.tokenService.refreshToken(token);
+
+        if (!newToken){
+            throw new Error ('Failed refresh token');
+        }
+        return newToken;
+    }
+
     async updateUser(token: string, data: UpdateUserData): Promise<User> {
         const findedUser = await this.findUserFromToken(token);
 

@@ -65,4 +65,11 @@ export class JwtTokenService implements ITokenService {
         }
     }
 
+    refreshToken(token: string): string{
+        if (!this.verifyToken(token)){
+            throw new Error('Invalid token');
+        }
+        return this.generateToken(this.decodeToken(token));
+    }
+
 }
