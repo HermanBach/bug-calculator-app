@@ -108,8 +108,7 @@ export class AuthController {
                     login: loginResult.user.login,
                     email: loginResult.user.email
                 },
-                accessToken: loginResult.accessToken,
-                expiresAt: loginResult.expiresAt
+                accessToken: loginResult.accessToken
             })
         } catch (error){
             const message = error instanceof Error ? error.message : "Login failed"

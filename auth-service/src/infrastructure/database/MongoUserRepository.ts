@@ -1,11 +1,12 @@
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { User } from "../../domain/entities/User.entity";
 import { UserModel } from "./models/User.model";
+import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 
 export class MongoUserRepository implements IUserRepository {
 
     private mapToEntity(user: any): User {
-        return new User(user._id.toString(), user.login, user.email, user.password);
+        return new User(user._id.toString(), user.login, user.email, user.password, user.isActive);
     }
 
     async findById(id: string): Promise<User | null> {
@@ -32,24 +33,29 @@ export class MongoUserRepository implements IUserRepository {
         return this.mapToEntity(userDoc);
     }
 
-    async update(user: User): Promise<User> {
+    async update(id: string, data: UpdateUserData): Promise<User> {
         const userDoc = await UserModel.findByIdAndUpdate(
-            user.id,
-            {
-                login: user.login,
-                email: user.email,
-                password: user.password
-            },
+            id,
+            data,
             {
                 new: true
             });
+
         if (!userDoc){
             throw new Error("User not found");
         }
         return this.mapToEntity(userDoc);
     }
-    async delete(id: string): Promise<boolean> {
-        const result = await UserModel.findByIdAndDelete(id);
-        return !!result;
+
+    async deactivate(id: string): Promise<boolean> {
+        const userDoc = await UserModel.findByIdAndUpdate(
+            id,
+            {
+                isActive: false
+            },
+            {
+                new: true
+            });
+        return !!userDoc;
     }
 }

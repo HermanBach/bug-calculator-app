@@ -4,6 +4,5 @@ export class LoginResult {
   constructor(
     public user: User,
     public accessToken: string,
-    public expiresAt: Date
   ) {}
 }

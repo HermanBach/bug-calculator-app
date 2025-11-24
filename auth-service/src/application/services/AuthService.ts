@@ -1,9 +1,10 @@
-import { IAuthService } from "../../domain/interfaces/IAuthService";
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { ITokenService } from "../../domain/interfaces/ITokenService";
 import { User } from "../../domain/entities/User.entity";
 import { LoginResult } from "../../domain/entities/loginResult.entity";
 import { PasswordService } from "../../infrastructure/auth/PasswordService";
+import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
+import { IAuthService } from "../../domain/interfaces/IAuthService";
 
 export class AuthService implements IAuthService {
     constructor (
@@ -12,7 +13,24 @@ export class AuthService implements IAuthService {
         private passwordService = new PasswordService()
     ) {}
 
+    private async findUserFromToken(token: string): Promise<User>{
+        const isTokenValid = await this.tokenService.verifyToken(token);
+        if (!isTokenValid){
+            throw new Error ('Invalid token');
+        }
 
+        const userId = await this.tokenService.decodeToken(token);
+        const findedUser = await this.userRepository.findById(userId);
+
+        if (!findedUser){
+            throw new Error('User not found');
+        }
+
+        return findedUser;
+    }
+    private generatorUserId(): string {
+        return `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
 
     async register(login: string, email: string, password: string): Promise<User> {
         const existUser = await this.userRepository.findByEmail(email);
@@ -27,8 +45,14 @@ export class AuthService implements IAuthService {
             this.generatorUserId(),
             login,
             email,
-            hashedPassword
+            hashedPassword,
+            true
         );
+
+        if (!newUser.isValidUser()){
+            const errors = newUser.getValidationErrors();
+            throw new Error(`Validation failed: ${errors.join(', ')}`);
+        }
 
         return await this.userRepository.save(newUser);
     }
@@ -47,12 +71,22 @@ export class AuthService implements IAuthService {
         }
 
         const token = this.tokenService.generateToken(findedUser.id);
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-        return new LoginResult(findedUser, token, expiresAt);
+        return new LoginResult(findedUser, token);
     }
 
-    private generatorUserId(): string {
-        return `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    async updateUser(token: string, data: UpdateUserData): Promise<User> {
+        const findedUser = await this.findUserFromToken(token);
+
+        const updateData = { ...data };
+        if (!!data.password){
+            updateData.password = await this.passwordService.hashPassword(data.password);
+        }
+        return await this.userRepository.update(findedUser.id, updateData);
+    }
+
+    async deactivateUser(token: string): Promise<boolean> {
+        const findedUser = await this.findUserFromToken(token);
+        return await this.userRepository.deactivate(findedUser.id)       
     }
 }
