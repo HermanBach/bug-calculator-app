@@ -105,6 +105,11 @@ SALTROUNDS=10
 LOG_LEVEL=debug
 ENABLE_DEBUG_ROUTES=true
 
+# GitHub OAuth
+GITHUB_CLIENT_ID=your_github_client_id_here
+GITHUB_CLIENT_SECRET=your_github_client_secret_here
+GITHUB_REDIRECT_URL=YOUR_REDIRECT_URL
+
 🚨 Important Security Notes
 Never commit .env.local to version control - add to .gitignore
 

@@ -10,4 +10,6 @@ export interface IAuthService {
     // user management
     updateUser(token: string, data: UpdateUserData): Promise<User>;
     deactivateUser(token: string): Promise<boolean>
+
+    oauthGithubLogin(provider: 'github', code: string): Promise<LoginResult>
 }

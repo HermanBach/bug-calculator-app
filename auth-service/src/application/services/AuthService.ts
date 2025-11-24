@@ -98,4 +98,9 @@ export class AuthService implements IAuthService {
         const findedUser = await this.findUserFromToken(token);
         return await this.userRepository.deactivate(findedUser.id)       
     }
+
+    async oauthGithubLogin(provider: "github", code: string): Promise<LoginResult> {
+        throw new Error("GitHub OAuth not implemented yet");
+    }
+
 }
