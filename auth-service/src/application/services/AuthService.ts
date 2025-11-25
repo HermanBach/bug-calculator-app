@@ -5,12 +5,14 @@ import { LoginResult } from "../../domain/entities/loginResult.entity";
 import { PasswordService } from "../../infrastructure/auth/PasswordService";
 import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 import { IAuthService } from "../../domain/interfaces/IAuthService";
+import { GitHubOAuthService } from "../../infrastructure/auth/GitHubOAuthService";
 
 export class AuthService implements IAuthService {
     constructor (
         private userRepository: IUserRepository,
         private tokenService: ITokenService,
-        private passwordService = new PasswordService()
+        private passwordService = new PasswordService(),
+        private gitHubOAuthService = new GitHubOAuthService()
     ) {}
 
     private async findUserFromToken(token: string): Promise<User>{
@@ -100,7 +102,19 @@ export class AuthService implements IAuthService {
     }
 
     async oauthGithubLogin(provider: "github", code: string): Promise<LoginResult> {
-        throw new Error("GitHub OAuth not implemented yet");
+        const githubUser = await this.gitHubOAuthService.getUserData(code);
+        const user = await this.userRepository.findByGithubId(githubUser.id);
+
+        if (!user){
+            // TODO: new user
+        }
+
+        if (!user?.isActive){
+            throw new Error("User account is deactivated");
+        }
+
+        const token = this.tokenService.generateToken(user.id);
+        return new LoginResult(user, token);
     }
 
 }

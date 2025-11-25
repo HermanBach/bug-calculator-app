@@ -6,7 +6,7 @@ import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 export class MongoUserRepository implements IUserRepository {
 
     private mapToEntity(user: any): User {
-        return new User(user._id.toString(), user.login, user.email, user.password, user.isActive);
+        return new User(user._id.toString(), user.login, user.email, user.password, user.isActive, user.githubId);
     }
 
     async findById(id: string): Promise<User | null> {
@@ -21,6 +21,11 @@ export class MongoUserRepository implements IUserRepository {
 
     async findByLogin(login: string): Promise<User | null> {
         const userDoc = await UserModel.findOne({ login });
+        return userDoc ? this.mapToEntity(userDoc) : null;
+    }
+
+    async findByGithubId(githubId: string): Promise<User | null> {
+        const userDoc = await UserModel.findOne({ githubId });
         return userDoc ? this.mapToEntity(userDoc) : null;
     }
 
