@@ -8,14 +8,15 @@ export class GitHubOAuthService {
     constructor() {
         const clientId = process.env.GITHUB_CLIENT_ID;
         const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+        const redirectUrl = process.env.GITHUB_REDIRECT_URL;
 
-        if (!clientId || !clientSecret) {
+        if (!clientId || !clientSecret || !redirectUrl) {
             throw new Error('GitHub OAuth credentials not found in environment variables');
         }
         
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.redirectUrl = 'http://localhost:3000/api/auth/github/callback';
+        this.redirectUrl = redirectUrl;
     }
 
     private async exchangeCodeForToken(code: string): Promise<string> {
