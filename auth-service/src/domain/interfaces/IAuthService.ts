@@ -11,5 +11,5 @@ export interface IAuthService {
     updateUser(token: string, data: UpdateUserData): Promise<User>;
     deactivateUser(token: string): Promise<boolean>
 
-    oauthGithubLogin(provider: 'github', code: string): Promise<LoginResult>
+    oauthGithubLogin(code: string): Promise<LoginResult>
 }

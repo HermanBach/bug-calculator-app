@@ -6,6 +6,7 @@ import { PasswordService } from "../../infrastructure/auth/PasswordService";
 import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 import { IAuthService } from "../../domain/interfaces/IAuthService";
 import { GitHubOAuthService } from "../../infrastructure/auth/GitHubOAuthService";
+import { GitHubUserData } from "../../presentation/dto/GitHubUserData";
 
 export class AuthService implements IAuthService {
     constructor (
@@ -30,8 +31,38 @@ export class AuthService implements IAuthService {
 
         return findedUser;
     }
+
     private generatorUserId(): string {
         return `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    private async createUserFromGithub(githubUser: GitHubUserData): Promise<User>{
+        
+        const login = await this.getNewOauthLogin(githubUser.login);
+        
+        const newUser = this.register(login, githubUser.email, githubUser.name)
+
+        if (!newUser){
+            throw new Error ('Error user registrate');
+        }
+
+        return newUser;
+    }
+
+    private async getNewOauthLogin(login: string){
+        if (await this.userRepository.findByLogin(login)){
+            return login;
+        }
+
+        let newLogin = login;
+        let counter = 1;
+    
+        while (await this.userRepository.findByLogin(login)) {
+            newLogin = `${login}${counter}`;
+            counter++;
+        }
+        
+        return newLogin;
     }
 
     async register(login: string, email: string, password: string): Promise<User> {
@@ -101,12 +132,12 @@ export class AuthService implements IAuthService {
         return await this.userRepository.deactivate(findedUser.id)       
     }
 
-    async oauthGithubLogin(provider: "github", code: string): Promise<LoginResult> {
+    async oauthGithubLogin(code: string): Promise<LoginResult> {
         const githubUser = await this.gitHubOAuthService.getUserData(code);
-        const user = await this.userRepository.findByGithubId(githubUser.id);
+        let user = await this.userRepository.findByGithubId(githubUser.id);
 
         if (!user){
-            // TODO: new user
+            user = await this.createUserFromGithub(githubUser);
         }
 
         if (!user?.isActive){
