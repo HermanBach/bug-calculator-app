@@ -23,13 +23,13 @@ export class AuthService implements IAuthService {
         }
 
         const userId = await this.tokenService.decodeToken(token);
-        const findedUser = await this.userRepository.findById(userId);
+        const user = await this.userRepository.findById(userId);
 
-        if (!findedUser){
+        if (!user){
             throw new Error('User not found');
         }
 
-        return findedUser;
+        return user;
     }
 
     private generatorUserId(): string {
@@ -37,38 +37,51 @@ export class AuthService implements IAuthService {
     }
 
     private async createUserFromGithub(githubUser: GitHubUserData): Promise<User>{
-        
         const login = await this.getNewOauthLogin(githubUser.login);
         
-        const newUser = this.register(login, githubUser.email, githubUser.name)
+        const hashedPassword = await this.passwordService.hashPassword(this.generatorUserId());
+        
+        const newUser = new User(
+            this.generatorUserId(),
+            login,
+            githubUser.email,
+            hashedPassword,
+            true,
+            githubUser.id // добавляем githubId
+        );
 
-        if (!newUser){
-            throw new Error ('Error user registrate');
+        if (!newUser.isValidUser()){
+            const errors = newUser.getValidationErrors();
+            throw new Error(`Validation failed: ${errors.join(', ')}`);
         }
 
-        return newUser;
+        return await this.userRepository.save(newUser);
     }
 
-    private async getNewOauthLogin(login: string){
-        if (await this.userRepository.findByLogin(login)){
+    private async getNewOauthLogin(login: string): Promise<string>{
+        if (!await this.userRepository.findByLogin(login)){
             return login;
         }
 
         let newLogin = login;
         let counter = 1;
     
-        while (await this.userRepository.findByLogin(login)) {
+        while (await this.userRepository.findByLogin(newLogin)) {
             newLogin = `${login}${counter}`;
             counter++;
+
+            if (counter > 1000) {
+                throw new Error("Cannot generate unique login");
+            }
         }
         
         return newLogin;
     }
 
     async register(login: string, email: string, password: string): Promise<User> {
-        const existUser = await this.userRepository.findByEmail(email);
+        const existingUser = await this.userRepository.findByEmail(email);
         
-        if (existUser){
+        if (existingUser){
             throw new Error ("User with this email already exists");
         }
 
@@ -91,21 +104,21 @@ export class AuthService implements IAuthService {
     }
 
     async login(identifier: string, password: string): Promise<LoginResult> {
-        const findedUser =  await this.userRepository.findByEmail(identifier) || await this.userRepository.findByLogin(identifier);
+        const user =  await this.userRepository.findByEmail(identifier) || await this.userRepository.findByLogin(identifier);
 
-        if (!findedUser){
+        if (!user){
             throw new Error ("User not found");
         }
 
-        const passwordIsValid = await this.passwordService.comparePassword(password, findedUser.password);
+        const passwordIsValid = await this.passwordService.comparePassword(password, user.password);
 
         if (!passwordIsValid){
             throw new Error ("Invalid password");
         }
 
-        const token = this.tokenService.generateToken(findedUser.id);
+        const token = this.tokenService.generateToken(user.id);
 
-        return new LoginResult(findedUser, token);
+        return new LoginResult(user, token);
     }
 
     refreshToken(token: string): string {
@@ -118,22 +131,45 @@ export class AuthService implements IAuthService {
     }
 
     async updateUser(token: string, data: UpdateUserData): Promise<User> {
-        const findedUser = await this.findUserFromToken(token);
+        const user = await this.findUserFromToken(token);
+
+        if (data.email && data.email !== user.email) {
+            const existingUser = await this.userRepository.findByEmail(data.email);
+            if (existingUser) {
+                throw new Error("Email already in use");
+            }
+        }
 
         const updateData = { ...data };
-        if (!!data.password){
+        if (data.password){
+            if (data.password.length < 6) {
+                throw new Error("Password must be at least 6 characters");
+            }
             updateData.password = await this.passwordService.hashPassword(data.password);
         }
-        return await this.userRepository.update(findedUser.id, updateData);
+        return await this.userRepository.update(user.id, updateData);
     }
 
     async deactivateUser(token: string): Promise<boolean> {
-        const findedUser = await this.findUserFromToken(token);
-        return await this.userRepository.deactivate(findedUser.id)       
+        const user = await this.findUserFromToken(token);
+        return await this.userRepository.deactivate(user.id)       
     }
 
     async oauthGithubLogin(code: string): Promise<LoginResult> {
         const githubUser = await this.gitHubOAuthService.getUserData(code);
+
+        if (!githubUser){
+            throw new Error('GitHub user data not found');
+        }
+
+        if (!githubUser.id) {
+            throw new Error('GitHub user ID is required');
+        }
+
+        if (!githubUser.email) {
+            throw new Error('GitHub account email is required');
+        }
+
         let user = await this.userRepository.findByGithubId(githubUser.id);
 
         if (!user){
