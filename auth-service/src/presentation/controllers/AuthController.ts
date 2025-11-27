@@ -158,9 +158,9 @@ export class AuthController {
      *       401:
      *         description: Authentication failed
      */
-    async oauthGithubLogin(req: Request, resp: Response){
+    async github(req: Request, resp: Response){
         try{
-            const code = req.body;
+            const { code } = req.body;
             if (!code) {
                 return resp.status(400).json({
                     error: 'Authorization code is required'

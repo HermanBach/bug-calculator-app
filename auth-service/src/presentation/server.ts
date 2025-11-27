@@ -35,6 +35,6 @@ app.get('/auth-service/health', HealthController.check);
 app.post('/auth-service/auth/register', (req, res) => authController.register(req, res));
 app.post('/auth-service/auth/login', (req, res) => authController.login(req, res));
 app.post('/auth-service/auth/logout', (req, res) => authController.logout(req, res));
-
+app.post('/auth-service/auth/github', (req, res) => authController.github(req, res));
 
 startServer();

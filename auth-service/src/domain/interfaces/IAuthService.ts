@@ -4,7 +4,7 @@ import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 
 export interface IAuthService {
     // authentication
-    register(login: string, email: string, password: string): Promise<User>;
+    register(login: string, email: string, password: string, githubId?: string): Promise<User>;
     login(identifier: string, password: string): Promise<LoginResult>;
     refreshToken(token: string): string;
     // user management
