@@ -59,6 +59,7 @@ export class AuthController {
             return resp.status(400).json({ error: message });
         }
     }
+
     /**
      * @swagger
      * /auth-service/auth/login:
@@ -115,6 +116,7 @@ export class AuthController {
             return resp.status(400).json({ error: message });
         }
     }
+
     /**
      * @swagger
      * /auth-service/auth/logout:
@@ -128,6 +130,66 @@ export class AuthController {
     async logout (req: Request, resp: Response){
         // TODO: make with blacklist
         resp.json({message: "Logged out successfully"});
+    }
+
+    /**
+     * @swagger
+     * /auth-service/auth/github:
+     *   post:
+     *     summary: Authenticate user via GitHub OAuth
+     *     tags: [Authentication]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - code
+     *             properties:
+     *               code:
+     *                 type: string
+     *                 description: GitHub OAuth authorization code
+     *     responses:
+     *       200:
+     *         description: Successfully authenticated
+     *       400:
+     *         description: Invalid or missing authorization code
+     *       401:
+     *         description: Authentication failed
+     */
+    async oauthGithubLogin(req: Request, resp: Response){
+        try{
+            const code = req.body;
+            if (!code) {
+                return resp.status(400).json({
+                    error: 'Authorization code is required'
+                });
+            }
+            const result = await this.authService.oauthGithubLogin(code);
+            
+            return resp.status(200).json(result);
+
+        } catch (error){
+            const err = error as Error;
+        
+            if (err.message.includes('GitHub user data not found') || 
+                err.message.includes('GitHub user ID is required') ||
+                err.message.includes('GitHub account email is required')) {
+                return resp.status(400).json({
+                    error: err.message
+                });
+            }
+
+            if (err.message.includes('User account is deactivated')) {
+                return resp.status(401).json({
+                    error: err.message
+                });
+            }
+            return resp.status(500).json({
+                error: 'Internal server error'
+            });
+        } 
     }
 
 }
