@@ -119,6 +119,7 @@ ENABLE_DEBUG_ROUTES=true
 GITHUB_CLIENT_ID=your_github_client_id_here
 GITHUB_CLIENT_SECRET=your_github_client_secret_here
 GITHUB_REDIRECT_URL=http://localhost:3000/auth/github/callback
+```
 🚀 Quick Start
 Prerequisites
 Node.js 18+
