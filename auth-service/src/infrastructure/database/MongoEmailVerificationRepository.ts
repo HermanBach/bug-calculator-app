@@ -1,7 +1,7 @@
 import { IEmailVerificationRepository, VerificationCode } from "../auth/interfaces/IEmailVerificationRepository";
 import { EmailVerification } from "./models/EmailVerification.model";
 
-export class EmailVerificationRepository implements IEmailVerificationRepository{
+export class MongoEmailVerificationRepository implements IEmailVerificationRepository{
     async saveCode(email: string, code: string, expiresAt: Date): Promise<void> {
         await EmailVerification.findOneAndUpdate(
             { email },
@@ -38,10 +38,11 @@ export class EmailVerificationRepository implements IEmailVerificationRepository
     async getRecentAttempts(email: string, timeframeMs: number): Promise<number> {
         const since = new Date(Date.now() - timeframeMs);
 
-        const count = EmailVerification.countDocuments({
+        const count = await EmailVerification.countDocuments({
             email: email,
-            createAt: { $gte: since }
+            createdAt: { $gte: since }
         });
+        
         return count;
     }
     

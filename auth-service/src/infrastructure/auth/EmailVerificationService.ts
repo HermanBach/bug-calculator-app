@@ -1,13 +1,51 @@
 import { IEmailVerificationService } from "../../domain/interfaces/IEmailVerificationService";
+import { IEmailVerificationRepository } from "./interfaces/IEmailVerificationRepository";
+import { IEmailService } from "../../domain/interfaces/IEmailService";
+import { CodeGenerator } from "./CodeGenerator";
 
 export class EmailVerificationService implements IEmailVerificationService{
+    private readonly RESEND_DELAY_MS: number;
+    private readonly MAX_ATTEMPTS_PER_HOUR: number;
+    
+    constructor(
+        private emailVerificationRepo: IEmailVerificationRepository,
+        private emailService: IEmailService,
+        private codeGenerator: CodeGenerator
+    ){
+        const delay = process.env.RESEND_DELAY_MS;
+
+        if (!delay){
+            throw new Error('RESEND_DELAY_MS not found in environment variables')
+        }
+
+        const perHour = process.env.MAX_ATTEMPTS_PER_HOUR;
+
+        if (!perHour){
+            throw new Error('RESEND_DELAY_MS not found in environment variables')
+        }
+
+        this.RESEND_DELAY_MS = parseInt(delay);
+        this.MAX_ATTEMPTS_PER_HOUR = parseInt(perHour);
+    }
+
+    async canResendCode(email: string): Promise<boolean>{
+        const recentAttempts = await this.emailVerificationRepo.getRecentAttempts(
+            email,
+            60 * 60 * 1000
+        );
+        const lastSent = await this.emailVerificationRepo.getLastSentTime(email);
+
+        const isWithinRateLimit = recentAttempts < this.MAX_ATTEMPTS_PER_HOUR;
+        const isAfterDelay = !lastSent || 
+            (Date.now() - lastSent.getTime()) > this.RESEND_DELAY_MS;
+
+        return isWithinRateLimit && isAfterDelay;
+    };
+
     sendVerificationCode(email: string): Promise<boolean> {
         throw new Error ('sendVerificationCode not exist');
     }
     verifyCode(email: string, code: string): Promise<boolean> {
         throw new Error ('verifyCode not exist');
-    }
-    canResendCode(email: string): Promise<boolean> {
-        throw new Error ('canResendCode not exist');
     }
 }
