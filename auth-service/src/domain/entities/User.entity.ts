@@ -5,8 +5,13 @@ export class User {
         public email: string,
         public password: string,
         public isActive: boolean,
-        public githubId?: string
+        public githubId?: string,
+        public isEmailVerified: boolean = false
     ) {}
+
+    makeEmailVerified(): void {
+        this.isEmailVerified = true;
+    }
 
     isValidLogin(): boolean {
         return this.login.length >= 3 && 
