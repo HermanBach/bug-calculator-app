@@ -62,7 +62,20 @@ export class EmailVerificationService implements IEmailVerificationService{
         return emailSend
     }
 
-    verifyCode(email: string, code: string): Promise<boolean> {
-        throw new Error ('verifyCode not exist');
+    async verifyCode(email: string, code: string): Promise<boolean> {
+        const stored = await this.emailVerificationRepo.findCode(email);
+
+        if (!stored){
+            return false;
+        }
+
+        const isCodeValid = stored.code === code && stored.expiresAt > new Date() && stored.attempts < 3;
+
+        if (!isCodeValid){
+            await this.emailVerificationRepo.incrementAttempts(email);
+            return false;
+        }
+        await this.emailVerificationRepo.deleteCode(email);
+        return true;
     }
 }
