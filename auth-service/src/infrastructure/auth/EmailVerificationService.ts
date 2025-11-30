@@ -21,14 +21,14 @@ export class EmailVerificationService implements IEmailVerificationService{
         const perHour = process.env.MAX_ATTEMPTS_PER_HOUR;
 
         if (!perHour){
-            throw new Error('RESEND_DELAY_MS not found in environment variables')
+            throw new Error('MAX_ATTEMPTS_PER_HOUR not found in environment variables')
         }
 
         this.RESEND_DELAY_MS = parseInt(delay);
         this.MAX_ATTEMPTS_PER_HOUR = parseInt(perHour);
     }
 
-    async canResendCode(email: string): Promise<boolean>{
+    private async canResendCode(email: string): Promise<boolean>{
         const recentAttempts = await this.emailVerificationRepo.getRecentAttempts(
             email,
             60 * 60 * 1000
@@ -42,9 +42,26 @@ export class EmailVerificationService implements IEmailVerificationService{
         return isWithinRateLimit && isAfterDelay;
     };
 
-    sendVerificationCode(email: string): Promise<boolean> {
-        throw new Error ('sendVerificationCode not exist');
+    async sendVerificationCode(email: string): Promise<boolean> {
+        const canResendCode = await this.canResendCode(email);
+
+        if (!canResendCode){
+            return false;
+        }
+
+        const code = this.codeGenerator.generateVerificationCode();
+        const expiresAt = this.codeGenerator.generateExpiryDate();
+
+        await this.emailVerificationRepo.saveCode(email, code, expiresAt);
+
+        const emailSend = await this.emailService.sendVerificationCode(email, code);
+
+        if(!emailSend){
+            throw new Error ('Email doesn`t send');
+        }
+        return emailSend
     }
+
     verifyCode(email: string, code: string): Promise<boolean> {
         throw new Error ('verifyCode not exist');
     }

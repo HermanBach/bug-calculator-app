@@ -2,7 +2,7 @@ import { IEmailService } from "../../domain/interfaces/IEmailService";
 
 export class MockEmailService implements IEmailService{
 
-    async sendEmailVerificationCode(email: string, code: string): Promise<boolean> {
+    async sendVerificationCode(email: string, code: string): Promise<boolean> {
         console.log(`🎯 [MOCK EMAIL] Verification code: ${code} for ${email}`);
         return true;
     }
