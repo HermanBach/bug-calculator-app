@@ -83,6 +83,14 @@ bug-calculator-app/
 - **JWT Tokens** - Secure stateless authentication
 - **Token Refresh** - Extended session management
 
+### **Email Verification Flow**
+1. User registers → receives 6-digit verification code via email
+2. Code expires after 15 minutes, allows max 3 incorrect attempts
+3. Anti-spam protection: 5 codes per hour, 60-second cooldown between requests
+4. Successful verification marks user email as confirmed
+5. [Planned] Unverified users cannot login until email confirmed
+6. [Planned] Automatic cleanup of expired verification codes
+
 ### **User Management**
 - **Registration** with email validation
 - **Profile updates** with data validation
@@ -119,6 +127,11 @@ ENABLE_DEBUG_ROUTES=true
 GITHUB_CLIENT_ID=your_github_client_id_here
 GITHUB_CLIENT_SECRET=your_github_client_secret_here
 GITHUB_REDIRECT_URL=http://localhost:3000/auth/github/callback
+
+# Email Verification
+RESEND_DELAY_MS=60000
+MAX_ATTEMPTS_PER_HOUR=5
+VERIFICATION_CODE_EXPIRY_MINUTES=15
 ```
 🚀 Quick Start
 Prerequisites
@@ -155,15 +168,19 @@ docker-compose up -d
 docker-compose logs -f
 📚 API Documentation
 Available Endpoints
-POST /auth-service/auth/register - User registration
+`POST /auth-service/auth/register` - User registration
 
-POST /auth-service/auth/login - User login
+`POST /auth-service/auth/login` - User login
 
-POST /auth-service/auth/github - GitHub OAuth
+`POST /auth-service/auth/github` - GitHub OAuth
 
-POST /auth-service/auth/logout - User logout
+`POST /auth-service/auth/logout` - User logout
 
-GET /auth-service/health - Service health check
+`GET /auth-service/health` - Service health check
+
+`POST /auth-service/auth/verify-email` - Email verification
+
+`POST /auth-service/auth/resend-verification` - Resend verification code
 
 Interactive Documentation
 Swagger UI: http://localhost:3000/api-docs
