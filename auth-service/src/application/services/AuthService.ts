@@ -7,13 +7,15 @@ import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 import { IAuthService } from "../../domain/interfaces/IAuthService";
 import { GitHubOAuthService } from "../../infrastructure/auth/GitHubOAuthService";
 import { GitHubUserData } from "../../presentation/dto/GitHubUserData";
+import { IEmailVerificationService } from "../../domain/interfaces/IEmailVerificationService";
 
 export class AuthService implements IAuthService {
     constructor (
         private userRepository: IUserRepository,
         private tokenService: ITokenService,
+        private emailVerificationService: IEmailVerificationService,
         private passwordService = new PasswordService(),
-        private gitHubOAuthService = new GitHubOAuthService()
+        private gitHubOAuthService = new GitHubOAuthService(),
     ) {}
 
     private async findUserFromToken(token: string): Promise<User>{
@@ -47,7 +49,7 @@ export class AuthService implements IAuthService {
             githubUser.email,
             hashedPassword,
             true,
-            githubUser.id // добавляем githubId
+            githubUser.id
         );
 
         if (!newUser.isValidUser()){
@@ -76,6 +78,16 @@ export class AuthService implements IAuthService {
         }
         
         return newLogin;
+    }
+
+    private async userExistAndVerify(email: string): Promise<boolean>{
+        const user = await this.userRepository.findByEmail(email);
+
+        if (!user || user.isEmailVerified){
+            return false;
+        }
+
+        return true;
     }
 
     async register(login: string, email: string, password: string): Promise<User> {
@@ -182,6 +194,31 @@ export class AuthService implements IAuthService {
 
         const token = this.tokenService.generateToken(user.id);
         return new LoginResult(user, token);
+    }
+
+    async requestEmailVerification(email: string): Promise<boolean> {
+        if (!await this.userExistAndVerify(email)){
+            throw new Error("User not found or Email already verified");
+        }
+        return await this.emailVerificationService.sendVerificationCode(email);
+    }
+    
+    async verifyEmail(email: string, code: string): Promise<boolean> {
+        if (!await this.userExistAndVerify(email)){
+            throw new Error("User not found or Email already verified");
+        }
+
+        const isValid = await this.emailVerificationService.verifyCode(email, code);
+    
+        if (isValid){
+            const user = await this.userRepository.findByEmail(email);
+            if (user) {
+                user.makeEmailVerified();
+                await this.userRepository.save(user);
+            }
+        }
+    
+        return isValid;
     }
 
 }

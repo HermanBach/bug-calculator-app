@@ -12,4 +12,7 @@ export interface IAuthService {
     deactivateUser(token: string): Promise<boolean>
 
     oauthGithubLogin(code: string): Promise<LoginResult>
+
+    requestEmailVerification(email: string): Promise<boolean>
+    verifyEmail(email: string, code: string): Promise<boolean>
 }

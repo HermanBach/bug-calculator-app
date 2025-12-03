@@ -9,8 +9,8 @@ export interface IEmailVerificationRepository{
 }
 
 export interface VerificationCode {
-    code?: string;
-    expiresAt?: Date;
-    attempts?: number;
-    createdAt?: Date;
+    code: string;
+    expiresAt: Date;
+    attempts: number;
+    createdAt: Date;
 }
