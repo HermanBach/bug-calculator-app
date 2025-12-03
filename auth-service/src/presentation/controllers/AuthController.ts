@@ -2,6 +2,10 @@ import { Request, Response } from "express";
 import { AuthService } from "../../application/services/AuthService";
 import { MongoUserRepository } from "../../infrastructure/database/MongoUserRepository";
 import { JwtTokenService } from "../../infrastructure/auth/JwtTokenService";
+import { MongoEmailVerificationRepository } from "../../infrastructure/database/MongoEmailVerificationRepository";
+import { MockEmailService } from "../../infrastructure/email/MockEmailService";
+import { CodeGenerator } from "../../infrastructure/auth/CodeGenerator";
+import { EmailVerificationService } from "../../infrastructure/auth/EmailVerificationService";
 
 export class AuthController {
 
@@ -10,8 +14,21 @@ export class AuthController {
     constructor() {
         const userRepository = new MongoUserRepository();
         const tokenService = new JwtTokenService();
+        const emailVerificationRepo = new MongoEmailVerificationRepository();
+        const emailService = new MockEmailService();
+        const codeGenerator = new CodeGenerator();
 
-        this.authService = new AuthService(userRepository, tokenService);
+        const emailVerificationService = new EmailVerificationService(
+            emailVerificationRepo,
+            emailService,
+            codeGenerator
+        );
+
+        this.authService = new AuthService(
+            userRepository, 
+            tokenService,
+            emailVerificationService
+        );
     }
     /**
     * @swagger
