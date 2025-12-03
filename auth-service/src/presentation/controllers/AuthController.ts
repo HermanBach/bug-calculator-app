@@ -208,5 +208,124 @@ export class AuthController {
             });
         } 
     }
+    /**
+     * @swagger
+     * /auth-service/auth/request-verification:
+     *   post:
+     *     summary: Request email verification code
+     *     tags: [Authentication]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - email
+     *             properties:
+     *               email:
+     *                 type: string
+     *                 format: email
+     *     responses:
+     *       200:
+     *         description: Verification code sent successfully
+     *       400:
+     *         description: Invalid request or email already verified
+     *       404:
+     *         description: User not found
+     */
+    async requestVerification(req: Request, resp: Response) {
+        try{
+            const { email } = req.body;
+            
+            if (!email) {
+                return resp.status(400).json({
+                    error: 'Email is required'
+                });
+            }
+
+            const sent = await this.authService.requestEmailVerification(email);
+
+            if (!sent) {
+                return resp.status(400).json({
+                    error: 'Failed to send verification code'
+                });
+            }
+
+            resp.status(200).json({
+                message: 'Verification code sent to your email'
+            });
+
+        } catch (error){
+            const message = error instanceof Error ? error.message : "Request failed";
+            
+            if (message.includes('already verified') || message.includes('not found')) {
+                return resp.status(400).json({ error: message });
+            }
+            
+            return resp.status(500).json({ error: 'Internal server error' });
+        }
+    }
+    /**
+     * @swagger
+     * /auth-service/auth/verify-email:
+     *   post:
+     *     summary: Verify email with code
+     *     tags: [Authentication]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - email
+     *               - code
+     *             properties:
+     *               email:
+     *                 type: string
+     *                 format: email
+     *               code:
+     *                 type: string
+     *                 description: 6-digit verification code
+     *     responses:
+     *       200:
+     *         description: Email successfully verified
+     *       400:
+     *         description: Invalid verification code
+     *       404:
+     *         description: User not found
+     */
+    async verifyEmail(req: Request, resp: Response) {
+        try{
+            const { email, code } = req.body;
+
+            if (!email || !code) {
+                return resp.status(400).json({
+                    error: 'Email and verification code are required'
+                });
+            }
+            const verified = await this.authService.verifyEmail(email, code);
+        
+            if (!verified) {
+                return resp.status(400).json({
+                    error: 'Invalid or expired verification code'
+                });
+            }
+
+            resp.status(200).json({
+                message: 'Email successfully verified'
+            });
+
+        } catch (error){
+             const message = error instanceof Error ? error.message : "Verification failed";
+        
+            if (message.includes('already verified') || message.includes('not found')) {
+                return resp.status(400).json({ error: message });
+            }
+            
+            return resp.status(500).json({ error: 'Internal server error' });
+        }
+    }
 
 }

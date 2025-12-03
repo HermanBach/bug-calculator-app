@@ -36,5 +36,7 @@ app.post('/auth-service/auth/register', (req, res) => authController.register(re
 app.post('/auth-service/auth/login', (req, res) => authController.login(req, res));
 app.post('/auth-service/auth/logout', (req, res) => authController.logout(req, res));
 app.post('/auth-service/auth/github', (req, res) => authController.github(req, res));
+app.post('/auth-service/auth/request-verification', (req, res) => authController.requestVerification(req, res));
+app.post('/auth-service/auth/verify-email', (req, res) => authController.verifyEmail(req, res));
 
 startServer();
