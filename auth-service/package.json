@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@pskzcompany/winston-graylog": "^1.0.1",
     "amqplib": "^0.10.9",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
@@ -18,15 +19,13 @@
     "dotenv": "^17.2.3",
     "dotenv-flow": "^4.1.0",
     "express": "^5.1.0",
-    "gelf": "^2.0.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
     "nodemailer": "^7.0.11",
     "passport": "^0.7.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "winston": "^3.18.3",
-    "winston-gelf": "^1.7.0"
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
