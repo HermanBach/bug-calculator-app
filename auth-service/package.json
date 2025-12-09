@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@pskzcompany/winston-graylog": "^1.0.1",
     "amqplib": "^0.10.9",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
@@ -23,7 +24,8 @@
     "nodemailer": "^7.0.11",
     "passport": "^0.7.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
