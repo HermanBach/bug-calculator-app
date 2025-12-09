@@ -1,7 +1,7 @@
 import { createLogger, transports, format } from "winston";
 import GraylogTransport from '@pskzcompany/winston-graylog';
 
-export class GrayLogLogger {
+export class GraylogLogger {
     private logger;
     
     constructor(serviceName: string = 'auth-service') {
@@ -63,6 +63,6 @@ export class GrayLogLogger {
     debug(message: string, meta?: any) {
         this.logger.debug(message, meta);
     }
-
-    
 }
+
+export const logger = new GraylogLogger('auth-service');
