@@ -1,0 +1,51 @@
+version: '3'
+services:
+  # 1. MongoDB для auth-service (данные пользователей)
+  mongo-auth:
+    image: mongo:6.0
+    container_name: mongo-auth
+    ports:
+      - "27017:27017"  # стандартный порт для auth-service
+    volumes:
+      - mongo_auth_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=auth_db
+  
+  # 2. MongoDB для Graylog (конфигурация)
+  mongo-graylog:
+    image: mongo:6.0  
+    container_name: mongo-graylog
+    ports:
+      - "27018:27017"  # другой порт чтобы не конфликтовать
+    volumes:
+      - mongo_graylog_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=graylog
+  
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+  
+  graylog:
+    image: graylog/graylog:5.0
+    environment:
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9000/
+      - GRAYLOG_MONGODB_URI=mongodb://mongo-graylog:27017/graylog  # ← к своему MongoDB
+    ports:
+      - "9000:9000"
+      - "12201:12201"
+      - "12201:12201/udp"
+    depends_on:
+      - mongo-graylog
+      - elasticsearch
+
+volumes:
+  mongo_auth_data:        # отдельный том для auth
+  mongo_graylog_data:     # отдельный том для graylog
+  elasticsearch_data:

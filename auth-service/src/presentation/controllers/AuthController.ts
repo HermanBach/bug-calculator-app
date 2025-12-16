@@ -6,6 +6,7 @@ import { MongoEmailVerificationRepository } from "../../infrastructure/database/
 import { MockEmailService } from "../../infrastructure/email/MockEmailService";
 import { CodeGenerator } from "../../infrastructure/auth/CodeGenerator";
 import { EmailVerificationService } from "../../infrastructure/auth/EmailVerificationService";
+import { logger } from "../../infrastructure/logging/GraylogLogger";
 
 export class AuthController {
 
@@ -64,7 +65,7 @@ export class AuthController {
             }
 
             const user = await this.authService.register(login, email, password);
-
+            logger.info('Register new user ' + login);
             resp.status(200).json({
                 id: user.id,
                 login: user.login,
@@ -72,7 +73,8 @@ export class AuthController {
             });
 
         } catch (error) {
-            const message = error instanceof Error ? error.message : "Registration failed"
+            const message = error instanceof Error ? error.message : "Registration failed";
+            logger.error(message);
             return resp.status(400).json({ error: message });
         }
     }
@@ -130,6 +132,7 @@ export class AuthController {
             })
         } catch (error){
             const message = error instanceof Error ? error.message : "Login failed"
+            logger.error(message);
             return resp.status(400).json({ error: message });
         }
     }
@@ -258,7 +261,7 @@ export class AuthController {
 
         } catch (error){
             const message = error instanceof Error ? error.message : "Request failed";
-            
+            logger.error(message);
             if (message.includes('already verified') || message.includes('not found')) {
                 return resp.status(400).json({ error: message });
             }
