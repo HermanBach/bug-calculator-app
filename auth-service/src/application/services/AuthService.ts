@@ -8,6 +8,7 @@ import { IAuthService } from "../../domain/interfaces/IAuthService";
 import { GitHubOAuthService } from "../../infrastructure/auth/GitHubOAuthService";
 import { GitHubUserData } from "../../presentation/dto/GitHubUserData";
 import { IEmailVerificationService } from "../../domain/interfaces/IEmailVerificationService";
+import { logger } from '../../infrastructure/logging/GraylogLogger'
 
 export class AuthService implements IAuthService {
     constructor (

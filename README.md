@@ -168,19 +168,13 @@ docker-compose up -d
 docker-compose logs -f
 📚 API Documentation
 Available Endpoints
-`POST /auth-service/auth/register` - User registration
-
-`POST /auth-service/auth/login` - User login
-
-`POST /auth-service/auth/github` - GitHub OAuth
-
-`POST /auth-service/auth/logout` - User logout
-
-`GET /auth-service/health` - Service health check
-
-`POST /auth-service/auth/verify-email` - Email verification
-
-`POST /auth-service/auth/resend-verification` - Resend verification code
+POST /auth-service/auth/register - User registration
+POST /auth-service/auth/login - User login
+POST /auth-service/auth/github - GitHub OAuth
+POST /auth-service/auth/logout - User logout
+GET /auth-service/health - Service health check
+POST /auth-service/auth/request-verification - Request email verification code
+POST /auth-service/auth/verify-email - Verify email with code
 
 Interactive Documentation
 Swagger UI: http://localhost:3000/api-docs
