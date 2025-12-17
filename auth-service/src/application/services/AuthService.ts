@@ -2,19 +2,20 @@ import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { ITokenService } from "../../domain/interfaces/ITokenService";
 import { User } from "../../domain/entities/User.entity";
 import { LoginResult } from "../../domain/entities/loginResult.entity";
-import { PasswordService } from "../../infrastructure/auth/PasswordService";
 import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 import { IAuthService } from "../../domain/interfaces/IAuthService";
+import { IEmailVerificationService } from "../../domain/interfaces/IEmailVerificationService";
+import { ILoggerService } from "../../domain/interfaces/ILoggerService";
+import { PasswordService } from "../../infrastructure/auth/PasswordService";
 import { GitHubOAuthService } from "../../infrastructure/auth/GitHubOAuthService";
 import { GitHubUserData } from "../../presentation/dto/GitHubUserData";
-import { IEmailVerificationService } from "../../domain/interfaces/IEmailVerificationService";
-import { logger } from '../../infrastructure/logging/GraylogLogger'
 
 export class AuthService implements IAuthService {
     constructor (
         private userRepository: IUserRepository,
         private tokenService: ITokenService,
         private emailVerificationService: IEmailVerificationService,
+        private logerService: ILoggerService,
         private passwordService = new PasswordService(),
         private gitHubOAuthService = new GitHubOAuthService(),
     ) {}

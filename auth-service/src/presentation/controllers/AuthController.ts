@@ -28,7 +28,8 @@ export class AuthController {
         this.authService = new AuthService(
             userRepository, 
             tokenService,
-            emailVerificationService
+            emailVerificationService,
+            logger
         );
     }
     /**
