@@ -13,12 +13,16 @@ import { JwtTokenService } from '../infrastructure/auth/JwtTokenService';
 import { MongoEmailVerificationRepository } from '../infrastructure/database/MongoEmailVerificationRepository';
 import { CodeGenerator } from '../infrastructure/auth/CodeGenerator';
 import { EmailVerificationService } from '../infrastructure/auth/EmailVerificationService';
+import { PasswordService } from '../infrastructure/auth/PasswordService';
+import { GitHubOAuthService } from '../infrastructure/auth/GitHubOAuthService';
 
 const userRepository = new MongoUserRepository();
 const tokenService = new JwtTokenService();
 const emailVerificationRepo = new MongoEmailVerificationRepository();
 const emailService = new MockEmailService();
 const codeGenerator = new CodeGenerator();
+const passwordService = new PasswordService();
+const githubService = new GitHubOAuthService();
 
 const emailVerificationService = new EmailVerificationService(
             emailVerificationRepo,
@@ -30,7 +34,9 @@ const authService = new AuthService(
   userRepository, 
   tokenService,
   emailVerificationService,
-  logger
+  logger,
+  passwordService,
+  githubService
 );
 
 const app = express();

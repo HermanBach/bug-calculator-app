@@ -6,8 +6,8 @@ import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 import { IAuthService } from "../../domain/interfaces/IAuthService";
 import { IEmailVerificationService } from "../../domain/interfaces/IEmailVerificationService";
 import { ILoggerService } from "../../domain/interfaces/ILoggerService";
-import { PasswordService } from "../../infrastructure/auth/PasswordService";
-import { GitHubOAuthService } from "../../infrastructure/auth/GitHubOAuthService";
+import { IPasswordService } from "../../domain/interfaces/IPasswordService";
+import { IGitHubOAuthService } from "../../domain/interfaces/IGitHubOAuthService";
 import { GitHubUserData } from "../../presentation/dto/GitHubUserData";
 
 export class AuthService implements IAuthService {
@@ -16,8 +16,8 @@ export class AuthService implements IAuthService {
         private tokenService: ITokenService,
         private emailVerificationService: IEmailVerificationService,
         private logerService: ILoggerService,
-        private passwordService = new PasswordService(),
-        private gitHubOAuthService = new GitHubOAuthService(),
+        private passwordService: IPasswordService,
+        private gitHubOAuthService: IGitHubOAuthService
     ) {}
 
     private async findUserFromToken(token: string): Promise<User>{
