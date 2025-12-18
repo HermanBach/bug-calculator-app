@@ -10,28 +10,8 @@ import { logger } from "../../infrastructure/logging/GraylogLogger";
 
 export class AuthController {
 
-    private authService: AuthService;
-
-    constructor() {
-        const userRepository = new MongoUserRepository();
-        const tokenService = new JwtTokenService();
-        const emailVerificationRepo = new MongoEmailVerificationRepository();
-        const emailService = new MockEmailService();
-        const codeGenerator = new CodeGenerator();
-
-        const emailVerificationService = new EmailVerificationService(
-            emailVerificationRepo,
-            emailService,
-            codeGenerator
-        );
-
-        this.authService = new AuthService(
-            userRepository, 
-            tokenService,
-            emailVerificationService,
-            logger
-        );
-    }
+    constructor(private authService: AuthService) {}
+    
     /**
     * @swagger
     * /auth-service/auth/register:

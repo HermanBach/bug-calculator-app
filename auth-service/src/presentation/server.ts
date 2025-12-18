@@ -5,13 +5,40 @@ import { MongoConnection } from '../infrastructure/database/Mongo.connection';
 import { HealthController } from './controllers/HealthController';
 import { swaggerSpec } from './swagger/swagger.config';
 import { AuthController } from './controllers/AuthController';
+import { logger } from '../infrastructure/logging/GraylogLogger';
+import { AuthService } from '../application/services/AuthService';
+import { MongoUserRepository } from '../infrastructure/database/MongoUserRepository';
+import { MockEmailService } from '../infrastructure/email/MockEmailService';
+import { JwtTokenService } from '../infrastructure/auth/JwtTokenService';
+import { MongoEmailVerificationRepository } from '../infrastructure/database/MongoEmailVerificationRepository';
+import { CodeGenerator } from '../infrastructure/auth/CodeGenerator';
+import { EmailVerificationService } from '../infrastructure/auth/EmailVerificationService';
+
+const userRepository = new MongoUserRepository();
+const tokenService = new JwtTokenService();
+const emailVerificationRepo = new MongoEmailVerificationRepository();
+const emailService = new MockEmailService();
+const codeGenerator = new CodeGenerator();
+
+const emailVerificationService = new EmailVerificationService(
+            emailVerificationRepo,
+            emailService,
+            codeGenerator
+        );
+
+const authService = new AuthService(
+  userRepository, 
+  tokenService,
+  emailVerificationService,
+  logger
+);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-const authController = new AuthController();
+const authController = new AuthController(authService);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
