@@ -38,7 +38,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-const authController = new AuthController(authService);
+const authController = new AuthController(authService, logger);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

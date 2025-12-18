@@ -1,17 +1,11 @@
 import { Request, Response } from "express";
 import { AuthService } from "../../application/services/AuthService";
-import { MongoUserRepository } from "../../infrastructure/database/MongoUserRepository";
-import { JwtTokenService } from "../../infrastructure/auth/JwtTokenService";
-import { MongoEmailVerificationRepository } from "../../infrastructure/database/MongoEmailVerificationRepository";
-import { MockEmailService } from "../../infrastructure/email/MockEmailService";
-import { CodeGenerator } from "../../infrastructure/auth/CodeGenerator";
-import { EmailVerificationService } from "../../infrastructure/auth/EmailVerificationService";
-import { logger } from "../../infrastructure/logging/GraylogLogger";
+import { ILoggerService } from "../../domain/interfaces/ILoggerService";
 
 export class AuthController {
 
-    constructor(private authService: AuthService) {}
-    
+    constructor(private authService: AuthService, private logger: ILoggerService) {}
+
     /**
     * @swagger
     * /auth-service/auth/register:
@@ -46,7 +40,6 @@ export class AuthController {
             }
 
             const user = await this.authService.register(login, email, password);
-            logger.info('Register new user ' + login);
             resp.status(200).json({
                 id: user.id,
                 login: user.login,
@@ -55,7 +48,6 @@ export class AuthController {
 
         } catch (error) {
             const message = error instanceof Error ? error.message : "Registration failed";
-            logger.error(message);
             return resp.status(400).json({ error: message });
         }
     }
@@ -113,7 +105,6 @@ export class AuthController {
             })
         } catch (error){
             const message = error instanceof Error ? error.message : "Login failed"
-            logger.error(message);
             return resp.status(400).json({ error: message });
         }
     }
@@ -242,7 +233,6 @@ export class AuthController {
 
         } catch (error){
             const message = error instanceof Error ? error.message : "Request failed";
-            logger.error(message);
             if (message.includes('already verified') || message.includes('not found')) {
                 return resp.status(400).json({ error: message });
             }
