@@ -8,7 +8,7 @@ import { IEmailVerificationService } from "../../domain/interfaces/IEmailVerific
 import { ILoggerService } from "../../domain/interfaces/ILoggerService";
 import { IPasswordService } from "../../domain/interfaces/IPasswordService";
 import { IGitHubOAuthService } from "../../domain/interfaces/IGitHubOAuthService";
-import { GitHubUserData } from "../../presentation/dto/GitHubUserData";
+import { GitHubUserData } from "../../domain/entities/GitHubUserData";
 
 export class AuthService implements IAuthService {
     constructor (
