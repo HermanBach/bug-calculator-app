@@ -1,4 +1,4 @@
-import { GitHubUserData } from "../../presentation/dto/GitHubUserData";
+import { GitHubUserData } from "../../domain/entities/GitHubUserData";
 
 export class GitHubOAuthService {
     private readonly clientId: string;

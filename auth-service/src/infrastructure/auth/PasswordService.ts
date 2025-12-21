@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
+import { IPasswordService } from '../../domain/interfaces/IPasswordService';
 
-export class PasswordService {
+export class PasswordService implements IPasswordService {
 
     async hashPassword(password: string): Promise<string>{
         const saltRounds = process.env.SALTROUNDS;

@@ -1,7 +1,8 @@
 import { createLogger, transports, format } from "winston";
+import { ILoggerService } from "../../domain/interfaces/ILoggerService";
 import GraylogTransport from '@pskzcompany/winston-graylog';
 
-export class GraylogLogger {
+export class GraylogLogger implements ILoggerService {
     private logger;
     
     constructor(serviceName: string = 'auth-service') {

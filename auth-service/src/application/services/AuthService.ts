@@ -2,21 +2,22 @@ import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { ITokenService } from "../../domain/interfaces/ITokenService";
 import { User } from "../../domain/entities/User.entity";
 import { LoginResult } from "../../domain/entities/loginResult.entity";
-import { PasswordService } from "../../infrastructure/auth/PasswordService";
 import { UpdateUserData } from "../../presentation/dto/UpdateUserData";
 import { IAuthService } from "../../domain/interfaces/IAuthService";
-import { GitHubOAuthService } from "../../infrastructure/auth/GitHubOAuthService";
-import { GitHubUserData } from "../../presentation/dto/GitHubUserData";
 import { IEmailVerificationService } from "../../domain/interfaces/IEmailVerificationService";
-import { logger } from '../../infrastructure/logging/GraylogLogger'
+import { ILoggerService } from "../../domain/interfaces/ILoggerService";
+import { IPasswordService } from "../../domain/interfaces/IPasswordService";
+import { IGitHubOAuthService } from "../../domain/interfaces/IGitHubOAuthService";
+import { GitHubUserData } from "../../domain/entities/GitHubUserData";
 
 export class AuthService implements IAuthService {
     constructor (
         private userRepository: IUserRepository,
         private tokenService: ITokenService,
         private emailVerificationService: IEmailVerificationService,
-        private passwordService = new PasswordService(),
-        private gitHubOAuthService = new GitHubOAuthService(),
+        private logerService: ILoggerService,
+        private passwordService: IPasswordService,
+        private gitHubOAuthService: IGitHubOAuthService
     ) {}
 
     private async findUserFromToken(token: string): Promise<User>{
