@@ -1,4 +1,4 @@
-export interface BugTestCase {
+export interface IBugTestCase {
   action: string;
   expected: string;
   actual: string;
